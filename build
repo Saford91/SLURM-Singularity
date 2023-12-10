@@ -3,9 +3,9 @@
 # Make sure we are in the right directory
 cd $(dirname $0)
 
-# Build the container
-./build_img $1
+# Build the build container
+./build_build_sif $1
 
-# Enter the build directory and execute the container to dump the packages
-cd ./builds
-../images/slurm-${1}.img
+# Enter the rpms directory and execute the container to dump the packages
+cd ./rpms
+../images/build/slurm-build-${1}.sif

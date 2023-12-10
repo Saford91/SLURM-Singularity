@@ -16,12 +16,12 @@ cd ..
 
 # Ensure the common image used for all other SLURM images is built
 # TODO: Ensure the common image is current
-if ! [ -e images/common.img ]; then
-  singularity build images/common.img definitions/common.def
+if ! [ -e images/build/common.sif ]; then
+  singularity build images/build/common.sif definitions/common.def
 fi
 
 # Now, we build.
 singularity build \
   --build-arg version=$1 \
-  images/slurm-${1}.img \
-  definitions/slurm.def
+  images/build/slurm-build-${1}.sif \
+  definitions/slurm-build.def

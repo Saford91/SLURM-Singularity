@@ -1,0 +1,17 @@
+Bootstrap: yum
+OSVersion: 7
+MirrorURL: http://mirror.centos.org/centos-%{OSVERIONS}/%{OSVERSION}/os/$basesearch
+Include: yum
+
+%files
+  etc /etc
+  rpms/{{build}} /slurm
+
+%post
+# Make sure the files we create are readable by all users
+umask 0022
+
+# Install all SLURM Packages into this container
+yum -y localinstall /slurm/*
+
+%runscript

@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: ./images/common.img
+From: ./images/build/common.img
 
 %files
   src /usr/local/slurm/src
@@ -8,7 +8,7 @@ From: ./images/common.img
 # Make sure the files we create are readable by all users
 umask 0022
 
-# Device the GIT tag we will need
+# Devise the GIT tag we will need
 tag=$(sed 's/\./-/g' <<< slurm-{{version}})
 
 # Create directory structure

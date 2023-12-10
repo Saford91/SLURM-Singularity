@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Get us in the right directory
+cd $(dirname $0)
+
+# Grab a copy of the SLURM source code and make sure it is current.
+cd src
+if ! [ -d slurm ]; then
+  git clone https://github.com/SchedMD/slurm
+else
+  cd slurm
+  git pull
+  cd ..
+fi
+cd ..
+
+# Ensure the common image used for all other SLURM images is built
+# TODO: Ensure the common image is current
+if ! [ -e images/build/common.sif ]; then
+  singularity build \
+    images/build/common.sif \
+    definitions/common.def
+fi
+
+# Now, we build.
+singularity build \
+  --build-arg version=$1 \
+  images/build/slurm-build-${1}.sif \
+  definitions/slurm-build.def
