@@ -1,0 +1,55 @@
+Bootstrap: localimage
+From: ./images/common.img
+
+%files
+  src /usr/local/slurm/src
+
+%post
+# Make sure the files we create are readable by all users
+umask 0022
+
+# Device the GIT tag we will need
+tag=$(sed 's/\./-/g' <<< slurm-{{version}})
+
+# Create directory structure
+mkdir -p /usr/local/slurm/{buildinfo,packages}
+
+# Enter the SLURM repo, checkout the desired tag, then create the release tarball
+cd /usr/local/slurm/src/slurm
+git checkout $tag
+rm -rf .git
+cd ..
+version=$(sed 's/-1$//' <<< {{version}})
+mv slurm slurm-$version
+tar -cjvf slurm-${version}.tar.bz2 slurm-${version}
+
+# Now, we build. 
+date +%s > /usr/local/slurm/buildinfo/build_start_$(date +%Y-%m-%dT%H-%M)
+rpmbuild \
+  --with hwloc \
+  --with nvml \
+  --with jwt \
+  --with slurmrestd \
+  -ta slurm-${version}.tar.bz2
+
+# Move packages to /usr/local/slurm
+mv ~/rpmbuild/RPMS/x86_64/* /usr/local/slurm/packages
+
+# Gather data about our build environment
+cd /usr/local/slurm/buildinfo
+rm -f build_*
+rpm -qa > system_rpm_packages
+touch patches # Nominal until actual patches are applied
+cp /etc/redhat-release .
+echo {{version}} > version
+tar -cf - . | md5sum > checksum.md5
+date +%s > build_start_$(date +%Y-%m-%dT%H-%M)
+touch built_in_$(($(cat build_end*) - $(cat build_start*)))_seconds
+
+# Install all SLURM Packages into this container
+yum -y localinstall /usr/local/slurm/packages/*
+
+%runscript
+target="./SLURM-$(cat /usr/local/slurm/buildinfo/version)-$(awk '{print $1}' /usr/local/slurm/buildinfo/checksum.md5)"
+mkdir $target
+cp -Rv /usr/local/slurm/{builddata,packages} ./$target

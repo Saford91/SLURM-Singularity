@@ -1,0 +1,43 @@
+Bootstrap: docker
+From: centos:centos7.9.2009
+
+
+%post
+# Prepare the image with necessary packages
+## Install Required Base and EPEL Packages
+
+yum -y install epel-release
+yum clean all
+
+yum -y install \
+  bzip2 \
+  gcc \
+  git \
+  http-parser-devel \
+  hwloc-devel \
+  json-c-devel \
+  libjwt-devel \
+  mariadb-devel \
+  munge-devel \
+  munge-libs \
+  pam-devel \
+  perl-ExtUtils-MakeMaker \
+  python3 \
+  readline-devel \
+  rpm-build \
+  wget
+
+
+## Configure NVidia Developers Repository and Install CUDA
+cat > /etc/yum.repos.d/nvidia-developer.repo <<EOF
+[nvidia-developer]
+name=NVidia Developer Packages
+baseurl=https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/
+gpgcheck=0
+enabled=1
+priority=1
+EOF
+
+yum clean all
+yum install -y cuda
+
