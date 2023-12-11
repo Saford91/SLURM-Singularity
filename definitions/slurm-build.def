@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: ./images/build/common.img
+From: ./images/build/common.sif
 
 %files
   src /usr/local/slurm/src

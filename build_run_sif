@@ -1,4 +1,5 @@
 #!/bin/bash
+# TODO: Make this build the run container
 
 # Get us in the right directory
 cd $(dirname $0)
